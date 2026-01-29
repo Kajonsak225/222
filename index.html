@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Farm Control</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #43cea2, #185a9d);
+      font-family: 'Kanit', sans-serif;
+      color: #fff;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      padding: 30px 40px;
+      border-radius: 20px;
+      text-align: center;
+      width: 300px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .status {
+      margin: 15px 0 25px;
+      font-size: 18px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 15px;
+      font-size: 18px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 600;
+    }
+
+    .on {
+      background: #00e676;
+      color: #004d40;
+    }
+
+    .off {
+      background: #ff5252;
+      color: #4a0000;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>🌱 Smart Farm</h1>
+    <div class="status" id="statusText">กำลังโหลด...</div>
+    <button class="btn" id="toggleBtn">...</button>
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC1a-XkNqLQ-fR9K9G3rRq4H3k9SKw9EF0",
+      databaseURL: "https://kjszz-1a818-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const enableRef = ref(db, "control/enable");
+
+    const statusText = document.getElementById("statusText");
+    const toggleBtn = document.getElementById("toggleBtn");
+
+    let systemEnable = false;
+
+    // 📡 realtime listener
+    onValue(enableRef, (snapshot) => {
+      systemEnable = snapshot.val() === true;
+
+      if (systemEnable) {
+        statusText.innerHTML = "🟢 ระบบกำลังทำงาน";
+        toggleBtn.innerHTML = "ปิดระบบ";
+        toggleBtn.className = "btn off";
+      } else {
+        statusText.innerHTML = "🔴 ระบบปิดอยู่";
+        toggleBtn.innerHTML = "เปิดระบบ";
+        toggleBtn.className = "btn on";
+      }
+    });
+
+    // 🔘 toggle button
+    toggleBtn.addEventListener("click", () => {
+      set(enableRef, !systemEnable);
+    });
+  </script>
+
+</body>
+</html>
