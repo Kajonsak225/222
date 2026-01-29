@@ -5,13 +5,12 @@
   <title>Smart Farm Control</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
 
   <style>
     body {
       margin: 0;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -23,26 +22,41 @@
     .card {
       background: rgba(255,255,255,0.15);
       backdrop-filter: blur(10px);
-      padding: 30px 40px;
+      padding: 25px 30px;
       border-radius: 20px;
-      text-align: center;
-      width: 300px;
+      width: 320px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
 
     h1 {
+      text-align: center;
       margin-bottom: 10px;
       font-weight: 600;
     }
 
     .status {
-      margin: 15px 0 25px;
+      text-align: center;
+      margin-bottom: 15px;
       font-size: 18px;
+    }
+
+    .sensor {
+      background: rgba(0,0,0,0.2);
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 6px 0;
+      font-size: 16px;
     }
 
     .btn {
       width: 100%;
-      padding: 15px;
+      padding: 14px;
       font-size: 18px;
       border-radius: 50px;
       border: none;
@@ -64,17 +78,40 @@
     .btn:hover {
       transform: scale(1.05);
     }
+
+    .ok { color: #00e676; }
+    .bad { color: #ff5252; }
   </style>
 </head>
 <body>
 
   <div class="card">
     <h1>🌱 Smart Farm</h1>
+
     <div class="status" id="statusText">กำลังโหลด...</div>
+
+    <div class="sensor">
+      <div class="row">
+        <span>📡 สถานะอุปกรณ์</span>
+        <span id="onlineText">-</span>
+      </div>
+      <div class="row">
+        <span>🌱 ความชื้นดิน</span>
+        <span id="soilText">- %</span>
+      </div>
+      <div class="row">
+        <span>🌡 อุณหภูมิ</span>
+        <span id="tempText">- °C</span>
+      </div>
+      <div class="row">
+        <span>🚨 Alarm</span>
+        <span id="alarmText">-</span>
+      </div>
+    </div>
+
     <button class="btn" id="toggleBtn">...</button>
   </div>
 
-  <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
@@ -87,33 +124,4 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const enableRef = ref(db, "control/enable");
-
-    const statusText = document.getElementById("statusText");
-    const toggleBtn = document.getElementById("toggleBtn");
-
-    let systemEnable = false;
-
-    // 📡 realtime listener
-    onValue(enableRef, (snapshot) => {
-      systemEnable = snapshot.val() === true;
-
-      if (systemEnable) {
-        statusText.innerHTML = "🟢 ระบบกำลังทำงาน";
-        toggleBtn.innerHTML = "ปิดระบบ";
-        toggleBtn.className = "btn off";
-      } else {
-        statusText.innerHTML = "🔴 ระบบปิดอยู่";
-        toggleBtn.innerHTML = "เปิดระบบ";
-        toggleBtn.className = "btn on";
-      }
-    });
-
-    // 🔘 toggle button
-    toggleBtn.addEventListener("click", () => {
-      set(enableRef, !systemEnable);
-    });
-  </script>
-
-</body>
-</html>
+    // ===
